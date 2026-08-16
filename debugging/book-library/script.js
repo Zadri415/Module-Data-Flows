@@ -1,4 +1,4 @@
-let myLibrary = [];
+const myLibrary = [];
 
 
 const titleInput = document.getElementById("title");
