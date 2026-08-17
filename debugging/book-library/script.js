@@ -38,7 +38,14 @@ function addBook() {
   // Preprocessing / validation:
   // - reject empty or whitespace-only title/author (checked AFTER trim, not before)
   // - reject non-numeric or non-positive page counts
-  if (!title || !author || !pagesRaw || !Number.isFinite(pages) || pages <= 0) {
+  if (
+  !title ||
+  !author ||
+  !Number.isInteger(pages) ||
+  pages <= 0
+) {
+  // invalid
+}
     alert("Please fill all fields with valid values!");
     return false;
   }
