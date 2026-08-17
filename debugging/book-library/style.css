@@ -1,19 +1,16 @@
-.form-group {
-  width: 400px;
-  height: 300px;
-  align-self: left;
-  padding-left: 20px;
+#toast {
+  position: fixed;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
 }
-
-.btn {
-  display: block;
-}
-
-.form-check-label {
-  padding-left: 20px;
-  margin: 5px 0px 5px 0px;
-}
-
-button.btn-info {
-  margin: 20px;
+#toast.show {
+  opacity: 1;
 }
