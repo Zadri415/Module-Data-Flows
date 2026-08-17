@@ -1,4 +1,4 @@
-let myLibrary = [];
+const myLibrary = [];
 
 window.addEventListener("load", function (e) {
   populateStorage();
@@ -8,43 +8,45 @@ window.addEventListener("load", function (e) {
 function populateStorage() {
   // Seed with a couple of books if library is empty
   if (myLibrary.length === 0) {
-    const book1 = new Book("Robinson Crusoe", "Daniel Defoe", "252", true);
+    const book1 = new Book("Robinson Crusoe", "Daniel Defoe", 252, true);
     const book2 = new Book(
       "The Old Man and the Sea",
       "Ernest Hemingway",
-      "127",
+      127,
       true
     );
     myLibrary.push(book1, book2);
   }
 }
 
-const title = document.getElementById("title");
-const author = document.getElementById("author");
-const pages = document.getElementById("pages");
-const check = document.getElementById("check");
+const titleInput = document.getElementById("title");
+const authorInput = document.getElementById("author");
+const pagesInput = document.getElementById("pages");
+const checkInput = document.getElementById("check");
 
 //check the right input from forms and if its ok -> add the new book (object in array)
 //via Book function and start render function
 function addBook() {
-  // basic validation
-  if (!title.value || !author.value || !pages.value) {
-    alert("Please fill all fields!");
+  const title = titleInput.value.trim();
+  const author = authorInput.value.trim();
+  const pagesRaw = pagesInput.value.trim();
+  const pages = Number(pagesRaw);
+
+  // Validate AFTER trimming, so whitespace-only input is rejected too
+  if (!title || !author || !pagesRaw || !Number.isFinite(pages) || pages <= 0) {
+    alert("Please fill all fields with valid values!");
     return false;
   }
 
-  const book = new Book(
-    title.value.trim(),
-    author.value.trim(),
-    pages.value.trim(),
-    check.checked
-  );
+  const book = new Book(title, author, pages, checkInput.checked);
   myLibrary.push(book);
+
   // clear form inputs
-  title.value = "";
-  author.value = "";
-  pages.value = "";
-  check.checked = false;
+  titleInput.value = "";
+  authorInput.value = "";
+  pagesInput.value = "";
+  checkInput.checked = false;
+
   render();
   return true;
 }
@@ -52,7 +54,7 @@ function addBook() {
 function Book(title, author, pages, read) {
   this.title = title;
   this.author = author;
-  this.pages = pages;
+  this.pages = pages; // stored as a Number now, not a trimmed string
   // store as boolean under a descriptive property
   this.read = !!read;
 }
@@ -60,10 +62,11 @@ function Book(title, author, pages, read) {
 function render() {
   const table = document.getElementById("display");
   const tbody = table.getElementsByTagName("tbody")[0];
-  // clear existing rows in tbody
-  while (tbody.firstChild) tbody.removeChild(tbody.firstChild);
 
-  myLibrary.forEach((book, i) => {
+  // Clear existing rows in one operation instead of removing one at a time
+  tbody.innerHTML = "";
+
+  myLibrary.forEach((book) => {
     const row = document.createElement("tr");
 
     const titleCell = document.createElement("td");
@@ -95,7 +98,12 @@ function render() {
     delBut.textContent = "Delete";
     delBut.addEventListener("click", () => {
       if (confirm(`Delete "${book.title}"?`)) {
-        myLibrary.splice(i, 1);
+        // Look up by object identity, not by closure-captured index,
+        // so this stays correct even if myLibrary is ever reordered
+        // by something other than a full render().
+        const idx = myLibrary.indexOf(book);
+        if (idx === -1) return;
+        myLibrary.splice(idx, 1);
         render();
       }
     });
